@@ -5,14 +5,16 @@ import (
 	"reflect"
 )
 
-// FlatMap is alias of map[string]string
-type FlatMap map[string]string
+// Config is holds the FlattenMap configuration
+type Config struct {
+	AddLengthForArrays bool
+}
 
-// Flatten transform complex map to flatten map
-func Flatten(data map[string]interface{}) (flatmap FlatMap, err error) {
-	flatmap = make(FlatMap)
+// FlattenWithConfig transform complex map to flatten map
+func FlattenWithConfig(data map[string]interface{}, config Config) (flatmap map[string]interface{}, err error) {
+	flatmap = make(map[string]interface{})
 	for k, raw := range data {
-		err = flatten(flatmap, k, reflect.ValueOf(raw))
+		err = flatten(flatmap, k, config, reflect.ValueOf(raw))
 		if err != nil {
 			return nil, err
 		}
@@ -20,33 +22,35 @@ func Flatten(data map[string]interface{}) (flatmap FlatMap, err error) {
 	return
 }
 
-func flatten(result FlatMap, prefix string, v reflect.Value) (err error) {
+// Flatten transform complex map to flatten map
+func Flatten(data map[string]interface{}) (flatmap map[string]interface{}, err error) {
+	return FlattenWithConfig(data, Config{false})
+}
+
+func flatten(result map[string]interface{}, prefix string, config Config, v reflect.Value) (err error) {
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
+
 	switch v.Kind() {
 	case reflect.Bool:
-		if v.Bool() {
-			result[prefix] = "true"
-		} else {
-			result[prefix] = "false"
-		}
+		result[prefix] = v.Bool()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		result[prefix] = fmt.Sprintf("%d", v.Int())
+		result[prefix] = v.Int()
 	case reflect.Float64, reflect.Float32:
-		result[prefix] = fmt.Sprintf("%f", v.Float())
+		result[prefix] = v.Float()
 	case reflect.Map:
-		err = flattenMap(result, prefix, v)
+		err = flattenMap(result, prefix, config, v)
 		if err != nil {
 			return err
 		}
 	case reflect.Slice, reflect.Array:
-		err = flattenSliceArray(result, prefix, v)
+		err = flattenSliceArray(result, prefix, config, v)
 		if err != nil {
 			return err
 		}
 	case reflect.Struct:
-		err = flattenStruct(result, prefix, v)
+		err = flattenStruct(result, prefix, config, v)
 		if err != nil {
 			return err
 		}
@@ -60,7 +64,7 @@ func flatten(result FlatMap, prefix string, v reflect.Value) (err error) {
 	return nil
 }
 
-func flattenMap(result FlatMap, prefix string, v reflect.Value) (err error) {
+func flattenMap(result map[string]interface{}, prefix string, config Config, v reflect.Value) (err error) {
 	for _, k := range v.MapKeys() {
 		if k.Kind() == reflect.Interface {
 			k = k.Elem()
@@ -68,7 +72,7 @@ func flattenMap(result FlatMap, prefix string, v reflect.Value) (err error) {
 		if k.Kind() != reflect.String {
 			panic(fmt.Sprintf("%s: map key is not string: %s", prefix, k))
 		}
-		err = flatten(result, fmt.Sprintf("%s.%s", prefix, k.String()), v.MapIndex(k))
+		err = flatten(result, fmt.Sprintf("%s.%s", prefix, k.String()), config, v.MapIndex(k))
 		if err != nil {
 			return err
 		}
@@ -76,22 +80,31 @@ func flattenMap(result FlatMap, prefix string, v reflect.Value) (err error) {
 	return nil
 }
 
-func flattenSliceArray(result FlatMap, prefix string, v reflect.Value) (err error) {
+func flattenSliceArray(result map[string]interface{}, prefix string, config Config, v reflect.Value) (err error) {
 	prefix = prefix + "."
 	for i := 0; i < v.Len(); i++ {
-		err = flatten(result, fmt.Sprintf("%s%d", prefix, i), v.Index(i))
+		err = flatten(result, fmt.Sprintf("%s%d", prefix, i), config, v.Index(i))
 		if err != nil {
 			return err
 		}
 	}
+
+	if config.AddLengthForArrays {
+		err := flatten(result, fmt.Sprintf("%slength", prefix), config, reflect.ValueOf(v.Len()))
+
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-func flattenStruct(result FlatMap, prefix string, v reflect.Value) (err error) {
+func flattenStruct(result map[string]interface{}, prefix string, config Config, v reflect.Value) (err error) {
 	prefix = prefix + "."
 	ty := v.Type()
 	for i := 0; i < ty.NumField(); i++ {
-		err = flatten(result, fmt.Sprintf("%s%s", prefix, ty.Field(i).Name), v.Field(i))
+		err = flatten(result, fmt.Sprintf("%s%s", prefix, ty.Field(i).Name), config, v.Field(i))
 		if err != nil {
 			return err
 		}
