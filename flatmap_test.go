@@ -110,17 +110,17 @@ func TestFlatten(t *testing.T) {
 				"foo": []map[interface{}]interface{}{
 					map[interface{}]interface{}{
 						"name": "bar",
-						"ports": []string{
-							"1",
-							"2",
+						"ports": []int{
+							1,
+							2,
 						},
 					},
 				},
 			},
 			Output: map[string]interface{}{
 				"foo.0.name":    "bar",
-				"foo.0.ports.0": "1",
-				"foo.0.ports.1": "2",
+				"foo.0.ports.0": 1,
+				"foo.0.ports.1": 2,
 			},
 		},
 		{
