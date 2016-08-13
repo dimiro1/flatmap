@@ -1,5 +1,14 @@
 # flatmap
+
 flatmap transform nested map to flatten map
+
+# Fork
+
+This project is a fork of: https://github.com/astaxie/flatmap
+
+In the original project the author decided to output map[string]string, for this fork I needed that the result is of type map[string]interface{},
+also I added a new function FlattenWithConfig that accepts a configuration struct, for now the only config is AddLengthForArrays that if its is true
+and the value of the key is an array then the flattenner will add a new field length to the final map.  
 
 # How to use?
 
@@ -12,7 +21,7 @@ import (
 	"sort"
 	"encoding/json"
 
-	"github.com/astaxie/flatmap"
+	"github.com/dimiro1/flatmap"
 )
 
 var data =`
