@@ -39,9 +39,9 @@ func compare(t *testing.T, input, result, output map[string]interface{}) {
 		switch reflectValue.Kind() {
 		case reflect.Bool:
 			checkError(t, reflectValue.Bool() == result[k].(bool), input, result, output)
-		case reflect.Int:
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			checkError(t, reflectValue.Int() == result[k].(int64), input, result, output)
-		case reflect.Float64:
+		case reflect.Float64, reflect.Float32:
 			checkError(t, reflectValue.Float() == result[k].(float64), input, result, output)
 		case reflect.String:
 			checkError(t, reflectValue.String() == result[k].(string), input, result, output)
