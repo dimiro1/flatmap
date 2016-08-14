@@ -6,9 +6,10 @@ flatmap transform nested map to flatten map
 
 This project is a fork of: https://github.com/astaxie/flatmap
 
-In the original project the author decided to output map[string]string, for this fork I needed that the result is of type map[string]interface{},
-also I added a new function FlattenWithConfig that accepts a configuration struct, for now the only config is AddLengthForArrays that if its is true
-and the value of the key is an array then the flattenner will add a new field length to the final map.  
+Those are the changes I made on the original project: 
+
+1. I added a `struct` named `config` that is used in the function `FlattenWithConfig`. If it is set to true, it will add a new key to the `.length` sufixed array containing the quantity of elements in the original array; 
+2. I changed the original's function return type from `map[string]string` to `map[string]interface{}`.  
 
 # How to use?
 
