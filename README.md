@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dimiro1/flatmap.svg?branch=master)](https://travis-ci.org/dimiro1/flatmap)
+
 # flatmap
 
 flatmap transform nested map to flatten map
