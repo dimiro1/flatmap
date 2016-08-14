@@ -45,6 +45,8 @@ func compare(t *testing.T, input, result, output map[string]interface{}) {
 			checkError(t, reflectValue.Float() == result[k].(float64), input, result, output)
 		case reflect.String:
 			checkError(t, reflectValue.String() == result[k].(string), input, result, output)
+		case reflect.Invalid:
+			checkError(t, interface{}(nil) == result[k], input, result, output)
 		default:
 			// Throw error by default
 			checkError(t, false, input, result, output)
@@ -79,6 +81,16 @@ func TestFlatten(t *testing.T) {
 		},
 		{
 			Input: map[string]interface{}{
+				"foo": "bar",
+				"bar": nil,
+			},
+			Output: map[string]interface{}{
+				"foo": "bar",
+				"bar": nil,
+			},
+		},
+		{
+			Input: map[string]interface{}{
 				"foo": []string{
 					"one",
 					"two",
@@ -103,6 +115,24 @@ func TestFlatten(t *testing.T) {
 				"foo.0.name":    "bar",
 				"foo.0.port":    3000,
 				"foo.0.enabled": true,
+			},
+		},
+		{
+			Input: map[string]interface{}{
+				"foo": []map[interface{}]interface{}{
+					map[interface{}]interface{}{
+						"name":    "bar",
+						"port":    3000,
+						"enabled": true,
+						"bar":     nil,
+					},
+				},
+			},
+			Output: map[string]interface{}{
+				"foo.0.name":    "bar",
+				"foo.0.port":    3000,
+				"foo.0.enabled": true,
+				"foo.0.bar":     nil,
 			},
 		},
 		{

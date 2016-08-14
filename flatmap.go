@@ -57,7 +57,7 @@ func flatten(result map[string]interface{}, prefix string, config Config, v refl
 	case reflect.String:
 		result[prefix] = v.String()
 	case reflect.Invalid:
-		result[prefix] = ""
+		result[prefix] = interface{}(nil)
 	default:
 		return fmt.Errorf("Unknown: %s", v)
 	}
