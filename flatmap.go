@@ -81,16 +81,15 @@ func flattenMap(result map[string]interface{}, prefix string, config Config, v r
 }
 
 func flattenSliceArray(result map[string]interface{}, prefix string, config Config, v reflect.Value) (err error) {
-	prefix = prefix + "."
 	for i := 0; i < v.Len(); i++ {
-		err = flatten(result, fmt.Sprintf("%s%d", prefix, i), config, v.Index(i))
+		err = flatten(result, fmt.Sprintf("%s[%d]", prefix, i), config, v.Index(i))
 		if err != nil {
 			return err
 		}
 	}
 
 	if config.AddLengthForArrays {
-		err := flatten(result, fmt.Sprintf("%slength", prefix), config, reflect.ValueOf(v.Len()))
+		err := flatten(result, fmt.Sprintf("%s.length", prefix), config, reflect.ValueOf(v.Len()))
 
 		if err != nil {
 			return err

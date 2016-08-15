@@ -15,8 +15,8 @@ func TestFlattenWithConfig(t *testing.T) {
 				"array": []string{"one", "two"},
 			},
 			Output: map[string]interface{}{
-				"array.0":      "one",
-				"array.1":      "two",
+				"array[0]":     "one",
+				"array[1]":     "two",
 				"array.length": 2,
 			},
 		},
@@ -97,8 +97,8 @@ func TestFlatten(t *testing.T) {
 				},
 			},
 			Output: map[string]interface{}{
-				"foo.0": "one",
-				"foo.1": "two",
+				"foo[0]": "one",
+				"foo[1]": "two",
 			},
 		},
 		{
@@ -112,9 +112,9 @@ func TestFlatten(t *testing.T) {
 				},
 			},
 			Output: map[string]interface{}{
-				"foo.0.name":    "bar",
-				"foo.0.port":    3000,
-				"foo.0.enabled": true,
+				"foo[0].name":    "bar",
+				"foo[0].port":    3000,
+				"foo[0].enabled": true,
 			},
 		},
 		{
@@ -129,10 +129,10 @@ func TestFlatten(t *testing.T) {
 				},
 			},
 			Output: map[string]interface{}{
-				"foo.0.name":    "bar",
-				"foo.0.port":    3000,
-				"foo.0.enabled": true,
-				"foo.0.bar":     nil,
+				"foo[0].name":    "bar",
+				"foo[0].port":    3000,
+				"foo[0].enabled": true,
+				"foo[0].bar":     nil,
 			},
 		},
 		{
@@ -148,9 +148,9 @@ func TestFlatten(t *testing.T) {
 				},
 			},
 			Output: map[string]interface{}{
-				"foo.0.name":    "bar",
-				"foo.0.ports.0": 1,
-				"foo.0.ports.1": 2,
+				"foo[0].name":     "bar",
+				"foo[0].ports[0]": 1,
+				"foo[0].ports[1]": 2,
 			},
 		},
 		{
